@@ -1,0 +1,28 @@
+name: SentinelOne CNS Scan
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  cns-scan:
+    runs-on: ubuntu-latest
+    container:
+      image: pingsafe/s1-shift-left-cli:0.5.1
+      options: --entrypoint ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SentinelOne CNS CLI
+        run: >
+          s1-cns-cli config
+          --service-user-api-token ${{ eyJraWQiOiJ1cy1lYXN0LTEtcHJvZC0wIiwiYWxnIjoiRVMyNTYifQ.eyJzdWIiOiJzZXJ2aWNldXNlci03Yzk1Nzg0MS1lMTM4LTRmMjktYTU2OS0yMmRkMjMxODhiMWFAbWdtdC0xMTYzMy5zZW50aW5lbG9uZS5uZXQiLCJpc3MiOiJhdXRobi11cy1lYXN0LTEtcHJvZCIsImRlcGxveW1lbnRfaWQiOiIxMTYzMyIsInR5cGUiOiJ1c2VyIiwiZXhwIjoxNzU4MzYzODU0LCJpYXQiOjE3NTU2ODU1MTIsImp0aSI6ImJlMGFkZDU3LWU2YzUtNDNkNy04MzM2LTZiNjQ5ODQ2MzhiYSJ9.NmjJp_MxQ8mFpU5kjw5nm1HBCoiovwzbH9QqlblvXDaC-KHBdO-SKb6WGcm88oqnMp02iM4vkiLy291-CJ3-Fg }}
+          --management-console-url https://usea1-purple.sentinelone.net
+          --scope-type SITE
+          --scope-id 2271127775668844387
+          --tag ${{ secrets.tag }}
+
+      - name: Run Secret Detector
+        run: >
+          s1-cns-cli scan secret -d $PWD --publish-result
