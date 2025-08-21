@@ -11,18 +11,25 @@ jobs:
       image: pingsafe/s1-shift-left-cli:0.5.1
       options: --entrypoint ""
 
+    env:
+      S1_CONSOLE_URL: https://usea1-purple.sentinelone.net
+      S1_SCOPE_TYPE: SITE
+      S1_SCOPE_ID: "2271127775668844387"
+      S1_CNS_TAG: ${{ secrets.tag }}
+      S1_SERVICE_USER_API_TOKEN: ${{ secrets.S1_SERVICE_USER_API_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Configure SentinelOne CNS CLI
         run: >
           s1-cns-cli config
-          --service-user-api-token ${{ S1_SERVICE_USER_API_TOKEN }}
-          --management-console-url https://usea1-purple.sentinelone.net
-          --scope-type SITE
-          --scope-id 2271127775668844387
-          --tag ${{ secrets.tag }}
+          --service-user-api-token "$S1_SERVICE_USER_API_TOKEN"
+          --management-console-url "$S1_CONSOLE_URL"
+          --scope-type "$S1_SCOPE_TYPE"
+          --scope-id "$S1_SCOPE_ID"
+          --tag "$S1_CNS_TAG"
 
       - name: Run Secret Detector
         run: >
-          s1-cns-cli scan secret -d $PWD --publish-result
+          s1-cns-cli scan secret -d "$PWD" --publish-result
